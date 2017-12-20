@@ -36,6 +36,16 @@ public class Application {
 		return "Hello World";
 	}
 
+	@RequestMapping("/public1")
+	public String public1() {
+		return "Public One";
+	}
+
+	@RequestMapping("/public2")
+	public String public2() {
+		return "Public Two";
+	}
+	
 	@Bean
 	protected ResourceServerConfiguration adminResources() {
 
@@ -94,6 +104,62 @@ public class Application {
 
 	}
 
+	@Bean
+	protected ResourceServerConfiguration publicResources1() {
+
+		ResourceServerConfiguration resource = new ResourceServerConfiguration() {
+			// Switch off the Spring Boot @Autowired configurers
+			public void setConfigurers(List<ResourceServerConfigurer> configurers) {
+				super.setConfigurers(configurers);
+			}
+		};
+
+		resource.setConfigurers(Arrays.<ResourceServerConfigurer> asList(new ResourceServerConfigurerAdapter() {
+
+			@Override
+			public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+				resources.resourceId("oauth2/public1");
+			}
+
+			@Override
+			public void configure(HttpSecurity http) throws Exception {
+				http.antMatcher("/public1").authorizeRequests().anyRequest().permitAll();
+			}
+		}));
+		resource.setOrder(5);
+
+		return resource;
+
+	}
+	
+	@Bean
+	protected ResourceServerConfiguration publicResources2() {
+
+		ResourceServerConfiguration resource = new ResourceServerConfiguration() {
+			// Switch off the Spring Boot @Autowired configurers
+			public void setConfigurers(List<ResourceServerConfigurer> configurers) {
+				super.setConfigurers(configurers);
+			}
+		};
+
+		resource.setConfigurers(Arrays.<ResourceServerConfigurer> asList(new ResourceServerConfigurerAdapter() {
+
+			@Override
+			public void configure(ResourceServerSecurityConfigurer resources) throws Exception {
+				resources.resourceId("oauth2/public2");
+			}
+
+			@Override
+			public void configure(HttpSecurity http) throws Exception {
+				http.antMatcher("/public2").authorizeRequests().anyRequest().permitAll();
+			}
+		}));
+		resource.setOrder(6);
+
+		return resource;
+
+	}	
+	
 	@Configuration
 	@EnableAuthorizationServer
 	protected static class OAuth2Config extends AuthorizationServerConfigurerAdapter {
